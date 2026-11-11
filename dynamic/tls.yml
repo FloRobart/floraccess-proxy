@@ -1,0 +1,10 @@
+# "default" is the name Traefik looks for: these options apply to every route.
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+
+      # Refuses a client that does not name a known domain, such as a scanner going through
+      # the IP addresses: it would otherwise receive an answer from the server.
+      sniStrict: true

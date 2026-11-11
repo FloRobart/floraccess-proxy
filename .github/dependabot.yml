@@ -1,0 +1,21 @@
+version: 2
+
+updates:
+  # Traefik image of docker-compose.yml, public on Docker Hub: no registry login needed
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    target-branch: dev
+    commit-message:
+      prefix: "chore(deps)"
+    # Wait before adopting a new image, to limit the risk of compromised images
+    cooldown:
+      default-days: 7
+    # One pull request for all the minor and patch updates. Every major update gets its own
+    # pull request, so that a breaking one does not block the others
+    groups:
+      docker-compose-minor-and-patch-updates:
+        update-types:
+          - "minor"
+          - "patch"

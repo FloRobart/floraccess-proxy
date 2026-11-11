@@ -1,0 +1,18 @@
+# CI of the project: gitflow rules only.
+# This project has neither package.json nor pubspec.yaml: FloRobart/github-ci/auto.yml
+# cannot detect a type for it, so only the gitflow checks are called directly.
+# They enforce the branch flow and Conventional Commits. There is no release button.
+
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Keep the job id "ci": the ruleset of the protected branches expects a check named
+  # "ci / Checks".
+  ci:
+    uses: FloRobart/github-ci/.github/workflows/gitflow-checks.yml@main

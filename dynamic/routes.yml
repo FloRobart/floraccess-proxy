@@ -1,0 +1,51 @@
+# Everything Traefik exposes: a service that is not listed here cannot be reached from outside.
+#
+# Traefik reaches each service by its name, on the network of that service. The
+# docker-compose.override.yml of floraccess-wrapper connects Traefik to these networks.
+#
+# HTTPS, the certificate, the security headers and the rate limit come from the "websecure"
+# entrypoint. A "tls" key must not be added to a router: Traefik would serve its default
+# certificate instead of the Let's Encrypt one.
+
+http:
+  routers:
+    floraccess-api:
+      rule: "Host(`api.floraccess.florobart.fr`)"
+      entryPoints:
+        - websecure
+      service: floraccess-api
+
+    floraccess-app:
+      rule: "Host(`floraccess.florobart.fr`)"
+      entryPoints:
+        - websecure
+      service: floraccess-app
+
+    # Transition: former address of the API, still called by the applications that do not use
+    # api.floraccess.florobart.fr yet, and present in the links of the emails already sent.
+    # Served rather than redirected: a redirection would lose the body of the POST requests.
+    # To remove once no application and no pending email uses it anymore.
+    floraccess-legacy-api:
+      rule: "Host(`floraccess-server.florobart.fr`)"
+      entryPoints:
+        - websecure
+      service: floraccess-api
+
+  services:
+    floraccess-api:
+      loadBalancer:
+        servers:
+          - url: "http://floraccess-api:80"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 5s
+
+    floraccess-app:
+      loadBalancer:
+        servers:
+          - url: "http://floraccess-app:8080"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 5s

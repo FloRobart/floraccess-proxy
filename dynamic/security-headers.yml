@@ -1,0 +1,18 @@
+# Applied to every route by the "websecure" entrypoint.
+#
+# Traefik overwrites the headers set here. Only the ones with a single sensible value for
+# every application belong here: Referrer-Policy, X-Frame-Options and Content-Security-Policy
+# differ between applications, and stay in their own nginx configuration.
+
+http:
+  middlewares:
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+
+        # An empty value removes the header: there is no need to tell which software answers
+        customResponseHeaders:
+          Server: ""
+          X-Powered-By: ""

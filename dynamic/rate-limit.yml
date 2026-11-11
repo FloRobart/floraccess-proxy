@@ -1,0 +1,23 @@
+# Applied to every route by the "websecure" entrypoint. Answers 429 above the limit.
+#
+# The limit is per IP address, so the total number of users does not divide it. What sizes it
+# is the largest group of users sharing one address (mobile operator, company, school):
+#   - sustained: about 20 active users behind one address, at about 1 request per second each;
+#   - burst: about 3 first visits at the same time, at about 50 requests each.
+#
+# The API of each application that uses FlorAccess checks the JWT of each of its requests here,
+# always from the address of its own server: all its users share that address. The limiter of
+# floraccess-api itself (REQUEST_LIMIT_PER_SECOND) is stricter, so it is the one to raise first.
+
+http:
+  middlewares:
+    rate-limit:
+      rateLimit:
+        average: 30
+        period: 1s
+        burst: 150
+        sourceCriterion:
+          ipStrategy:
+            # A single IPv6 customer usually owns a whole /64: counting each address separately
+            # would let them escape the limit by changing address
+            ipv6Subnet: 64
